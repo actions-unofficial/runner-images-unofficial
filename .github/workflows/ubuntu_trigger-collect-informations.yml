@@ -1,0 +1,93 @@
+name: Ubuntu - Trigger Collect Informations
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+
+    outputs:
+      ReleaseName:
+        description: "GitHub Release Name"
+        value: ${{ jobs.CollectInformations.outputs.ReleaseName }}
+
+      ReleaseTag:
+        description: "GitHub Release Tag"
+        value: ${{ jobs.CollectInformations.outputs.ReleaseTag }}
+
+      HclFile:
+        description: "Packer HCL template filename"
+        value: ${{ jobs.CollectInformations.outputs.HclFile }}
+
+      ReleaseNo:
+        description: "Release number"
+        value: ${{ jobs.CollectInformations.outputs.ReleaseNo }}
+
+      ReadmeFile:
+        description: "README file"
+        value: ${{ jobs.CollectInformations.outputs.ReadmeFile }}
+
+      GitHubPrLabels:
+        description: "PR labels"
+        value: ${{ jobs.CollectInformations.outputs.GitHubPrLabels }}
+
+      HCloudObjectName:
+        description: "Legacy object name"
+        value: ${{ jobs.CollectInformations.outputs.HCloudObjectName }}
+
+      HCloudServerImage:
+        description: "Legacy server image"
+        value: ${{ jobs.CollectInformations.outputs.HCloudServerImage }}
+
+jobs:
+  CollectInformations:
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+
+    outputs:
+      ReleaseName: ${{ steps.vars.outputs.release_name }}
+      ReleaseTag: ${{ steps.vars.outputs.release_tag }}
+      HclFile: ${{ steps.vars.outputs.hcl_file }}
+      ReleaseNo: ${{ steps.vars.outputs.release_no }}
+      ReadmeFile: ${{ steps.vars.outputs.readme_file }}
+      GitHubPrLabels: ${{ steps.vars.outputs.github_pr_labels }}
+      HCloudObjectName: ${{ steps.vars.outputs.hcloud_object_name }}
+      HCloudServerImage: ${{ steps.vars.outputs.hcloud_server_image }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate workflow variables
+        id: vars
+        run: |
+          DATE="$(date +'%Y.%m.%d')"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+
+          echo "release_name=Ubuntu 26.04 Template Build ${DATE}" >> $GITHUB_OUTPUT
+          echo "release_tag=ubuntu-26.04-${DATE}-${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+          echo "hcl_file=build.ubuntu-26_04.pkr.hcl" >> $GITHUB_OUTPUT
+
+          echo "release_no=${DATE}" >> $GITHUB_OUTPUT
+
+          echo "readme_file=README.md" >> $GITHUB_OUTPUT
+
+          echo "github_pr_labels=ubuntu,packer,template,26.04" >> $GITHUB_OUTPUT
+
+          echo "hcloud_object_name=ubuntu-26.04-template" >> $GITHUB_OUTPUT
+
+          echo "hcloud_server_image=ubuntu-26.04" >> $GITHUB_OUTPUT
+
+      - name: Display collected information
+        run: |
+          echo "OS: ${{ inputs.os }}"
+          echo "Release Name: ${{ steps.vars.outputs.release_name }}"
+          echo "Release Tag: ${{ steps.vars.outputs.release_tag }}"
+          echo "HCL File: ${{ steps.vars.outputs.hcl_file }}"
+          echo "Release Number: ${{ steps.vars.outputs.release_no }}"
+          echo "README File: ${{ steps.vars.outputs.readme_file }}"
+          echo "GitHub Labels: ${{ steps.vars.outputs.github_pr_labels }}"
