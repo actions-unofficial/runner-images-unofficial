@@ -1,4 +1,4 @@
-name: Trigger Ubuntu26.04 CI
+name: Trigger Ubuntu26.04 CI Manual
 run-name: Ubuntu26.04 - Manual Build
 
 on:
