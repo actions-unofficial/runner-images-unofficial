@@ -1,0 +1,24 @@
+name: Trigger Ubuntu26.04 CI
+run-name: Ubuntu26.04 - Manual Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_type:
+        description: "Ubuntu image type"
+        required: true
+        default: "ubuntu2604"
+        type: choice
+        options:
+          - ubuntu2604
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  Ubuntu_2604:
+    uses: ./.github/workflows/trigger-ubuntu-win-build.yml
+    with:
+      image_type: ${{ inputs.image_type }}
+    secrets: inherit
